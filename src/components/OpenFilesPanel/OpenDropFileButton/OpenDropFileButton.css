@@ -1,0 +1,14 @@
+.open-drop-file-button {
+  display: inline-block;
+  margin: 0 10px 0 10px;
+}
+.open-drop-file-button div {
+  border: 1px solid gray;
+  padding: 5px;
+  box-sizing: border-box;
+  height: 30px;
+  font-weight: normal;
+}
+.open-drop-file-button input {
+  display: none;
+}

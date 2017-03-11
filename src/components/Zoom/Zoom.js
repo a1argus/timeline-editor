@@ -10,13 +10,14 @@ export default class Zoom extends Component {
     }
 
     onChangeZoom(e) {
-        this.props.onChangeZoom(e, this.props.zoom)
+        this.props.onChangeZoom(e.target.value, this.props.zoom)
     }
 
     render() {
         const { zoom } = this.props
         return (
             <input
+                className='zoom'
                 type='range'
                 min='1'
                 max='10'

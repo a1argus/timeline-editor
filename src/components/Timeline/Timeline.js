@@ -3,8 +3,8 @@ import * as d3 from 'd3'
 import shallowCompareWF from 'shallow-compare-without-functions'
 
 import layoutMerge from '../../modules/layoutMerge'
-import { d3Transform, debug, zoomToYears } from '../../modules/utils'
-import c2 from '../../modules/const'
+import { debug } from '../../modules/debug'
+import { transform1DToScale, transformToTransform1D, d3Transform } from '../../modules/transforms'
 import './Timeline.css'
 
 const c = {
@@ -16,19 +16,16 @@ const c = {
     duration: 500
 }
 
-const zoomToScale = (zoom) => {
-    let { year1, year2 } = zoomToYears(zoom)
-    return d3.scaleTime()
-    .domain([new Date(year1, 0, 1), new Date(year2, 0, 1)])
-    .range([0, c2.svgH])
-}
 
 export default class Timeline extends Component {
     static propTypes = {
         id: PropTypes.number.isRequired,
         item: PropTypes.object.isRequired,
-        zoom: PropTypes.object.isRequired,
+        screenSize: PropTypes.object.isRequired,
+        transform: PropTypes.object.isRequired,
         onDragTimeline: PropTypes.func.isRequired,
+        onMouseEnterEpoch: PropTypes.func.isRequired,
+        onMouseLeaveEpoch: PropTypes.func.isRequired,
     }
     
     constructor(props) {
@@ -37,8 +34,8 @@ export default class Timeline extends Component {
             id: props.id,
             epochs: props.item.epochs,
             duration: props.animation.duration,
-            zoom: props.zoom,
-            scale: zoomToScale(props.zoom),
+            transform: props.transform,
+            scale: transform1DToScale(transformToTransform1D(props.transform), [0, props.screenSize.height]),
             x: props.item.x,
             isDragged: false
         }
@@ -58,8 +55,8 @@ export default class Timeline extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         if(this.state2.isDragged) { return false }
         if(shallowCompareWF(this, nextProps, nextState)) {
-            this.state2.zoom = nextProps.zoom
-            this.state2.scale = zoomToScale(nextProps.zoom)
+            this.state2.transform = nextProps.transform
+            this.state2.scale = transform1DToScale(transformToTransform1D(nextProps.transform), [0, nextProps.screenSize.height])
             this.duration = nextProps.animation.duration
             this.calculateGeom()
             this.state2.epochs = layoutMerge(this.state2.epochs, "outerY", c.h0)
@@ -110,9 +107,11 @@ export default class Timeline extends Component {
             }
             else if (d.h < c.h1) {
                 d.regime = 'h1'
+                d.outerY = null
             }
             else {
                 d.regime = 'h2'
+                d.outerY = null
             }
         })
     }
@@ -121,7 +120,7 @@ export default class Timeline extends Component {
     redraw() {
         console.log('redraw')
         let timelineG = d3.select('.timeline_' + this.state2.id)
-        .attr('transform', `translate(${this.state2.zoom.translateX + this.state2.x}, ${0})`);
+        .attr('transform', `translate(${this.state2.transform.translateX + this.state2.x}, ${0})`);
 
         let epochG = timelineG
         .selectAll('.epoch')
@@ -135,6 +134,8 @@ export default class Timeline extends Component {
         .attr('class', 'epoch')
         .attr('transform', d => `translate(${c.titleW}, ${d.y})`)
         .classed('last', (d, i) => (i === this.state2.epochs.length - 1))
+        .on("mouseenter", this.props.onMouseEnterEpoch)
+        .on("mouseleave", this.props.onMouseLeaveEpoch)
 
 
         // epoch rect

@@ -1,38 +1,42 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { DragDropContext } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
 
 
 import {
     fetchData,
-    changeZoom,
+    changeTransform,
     dragScreen,
-    dragTimeline
+    dragTimeline,
+    selectEpoch,
+    unselectEpoch
 } from '../actions'
 import Screen from '../components/Screen/Screen'
-import Zoom from '../components/Zoom/Zoom'
-import { zoomToYears } from '../modules/utils'
+import ZoomKnob from '../components/ZoomKnob/ZoomKnob'
+import Scale from '../components/Scale/Scale'
+import OpenFilesPanel from '../components/OpenFilesPanel/OpenFilesPanel'
+import { transform1DToLimits, zoomByCenter } from '../modules/transforms'
 import './App.css'
-
-const zoomByCenter = (translateY, scaleY, newScaleY, screenCenter) => {
-    return {
-        translateY: translateY + screenCenter * ((1 / newScaleY) - (1 / scaleY)),
-        scaleY: newScaleY
-    }
-}
 
 class App extends Component {
     static propTypes = {
-        items: PropTypes.array.isRequired,
+        data: PropTypes.object.isRequired,
     }
 
-    onChangeZoom(e, zoom) {
-        let { translateY, scaleY } = zoomByCenter(
-            zoom.translateY,
-            zoom.scaleY,
-            parseInt(e.target.value, 10),
-            1000/2
+    onDropFile() {
+
+    }
+
+    onChangeZoom(value) {
+        let { transform, screen } = this.props
+        let { translate, scale } = zoomByCenter(
+            transform.translateY,
+            transform.scaleY,
+            1 / (parseFloat(value) / screen.size.height),
+            screen.size.height / 2
         )
-        this.props.dispatch(changeZoom(zoomToYears({...zoom, translateY, scaleY})))
+        this.props.dispatch(changeTransform(transform1DToLimits({translate, scale}, [0, screen.size.height]), [0, screen.size.height]))
     }
 
     onDragScreen(e) {
@@ -42,28 +46,58 @@ class App extends Component {
     onDragTimeline(e, id) {
         this.props.dispatch(dragTimeline(e.dx, e.dy, id))
     }
-    
+
+    onDragScale(e) {
+        this.props.dispatch(dragScreen(0, e.dy))
+    }
+
+    onMouseEnterEpoch(year1, year2, name) {
+        this.props.dispatch(selectEpoch(year1, year2, name))
+    }
+
+    onMouseLeaveEpoch() {
+        this.props.dispatch(unselectEpoch())
+    }
+
     componentDidMount() {
         this.props.dispatch(fetchData())
-        setTimeout(() => this.props.dispatch(changeZoom({year1: 1100, year2: 1800})), 2000)
     }
 
     
     render() {
-        const { items, zoom, animation } = this.props
+        const { data, transform, animation, screen } = this.props
 
         return (
             <div className='app'>
                 <Screen
-                    items={items}
-                    zoom={zoom}
+                    timelines={data.timelines}
+                    size={screen.size}
+                    transform={transform}
                     onDragScreen={this.onDragScreen.bind(this)}
                     onDragTimeline={this.onDragTimeline.bind(this)}
+                    onMouseEnterEpoch={this.onMouseEnterEpoch.bind(this)}
+                    onMouseLeaveEpoch={this.onMouseLeaveEpoch.bind(this)}
                     animation={animation}
                 />
-                <Zoom
-                    zoom={zoom}
+                <ZoomKnob
+                    value={screen.size.height / transform.scaleY}
+                    size={{width: 60, height: 400}}
+                    visorSizes={{width: 40, height: 30}}
+                    range={[100, 2000]}
+                    step={100}
                     onChangeZoom={this.onChangeZoom.bind(this)}
+                />
+                <Scale
+                    transform={transform}
+                    onDragScale={this.onDragScale.bind(this)}
+                    animation={animation}
+                />
+                <OpenFilesPanel
+                    files={data.files}
+                    message='Загрузить файлы'
+                    coords={{x: 1300, y: 20}}
+                    onClear={this.onDropFile.bind(this)}
+                    onOpen={this.onDropFile.bind(this)}
                 />
             </div>
         )
@@ -71,12 +105,13 @@ class App extends Component {
 }
 
 const mapStateToProps = state => {
-  const { items, zoom, animation } = state
+  const { data, transform, animation, screen } = state
   return {
-      items,
-      zoom,
-      animation
+      data,
+      transform,
+      animation,
+      screen
   }
 }
 
-export default connect(mapStateToProps)(App)
+export default DragDropContext(HTML5Backend)(connect(mapStateToProps)(App))

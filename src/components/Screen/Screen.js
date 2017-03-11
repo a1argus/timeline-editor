@@ -1,8 +1,9 @@
 import React, { PropTypes, Component } from 'react'
 import * as d3 from 'd3'
+import _ from 'lodash'
 
-import c from '../../modules/const'
-import { d3Transform, debug } from '../../modules/utils'
+import { debug } from '../../modules/debug'
+import { d3Transform } from '../../modules/transforms'
 import Timeline from '../Timeline/Timeline'
 import './Screen.css'
 
@@ -10,10 +11,13 @@ import './Screen.css'
 
 export default class Screen extends Component {
     static propTypes = {
-        items: PropTypes.array.isRequired,
+        timelines: PropTypes.object.isRequired,
+        size: PropTypes.object.isRequired,
         onDragScreen: PropTypes.func.isRequired,
         animation: PropTypes.object.isRequired,
         onDragTimeline: PropTypes.func.isRequired,
+        onMouseEnterEpoch: PropTypes.func.isRequired,
+        onMouseLeaveEpoch: PropTypes.func.isRequired,
     }
 
     constructor() {
@@ -73,39 +77,46 @@ export default class Screen extends Component {
     }
 
     render() {
-        const { items, zoom, animation, onDragTimeline } = this.props
+        const { timelines, size, transform, animation, onDragTimeline, onMouseEnterEpoch, onMouseLeaveEpoch } = this.props
         return (
-            <svg
-                width={c.svgW}
-                height={c.svgH}
+            <div
                 className='screen'
+                style={{width: size.width, height: size.height}}
             >
-                <g
-                    ref={(screenG) => { this.screenG = screenG }}
-                    className='screen-g'
-                    transform="translate(0, 0)"
+                <svg
+                    width={size.width}
+                    height={size.height}
                 >
-                    <rect
-                        x={-10000/2}
-                        y={-10000/2}
-                        width={10000}
-                        height={10000} 
-                        className='screen-back'
-                    />
-                    {
-                        items.map((item, i) => (
-                            <Timeline
-                                key={i}
-                                id={0}
-                                item={item}
-                                zoom={zoom}
-                                animation={animation}
-                                onDragTimeline={onDragTimeline}
-                            />
-                        ))
-                    }
-                </g>    
-            </svg>
+                    <g
+                        ref={(screenG) => { this.screenG = screenG }}
+                        className='screen-g'
+                        transform='translate(0, 0)'
+                    >
+                        <rect
+                            x={-10000/2}
+                            y={-10000/2}
+                            width={10000}
+                            height={10000}
+                            className='screen-back'
+                        />
+                        {
+                            _.values(timelines).map((timeline, i) => (
+                                <Timeline
+                                    key={timeline.id}
+                                    id={timeline.id}
+                                    item={timeline}
+                                    screenSize={size}
+                                    transform={transform}
+                                    animation={animation}
+                                    onDragTimeline={onDragTimeline}
+                                    onMouseEnterEpoch={onMouseEnterEpoch}
+                                    onMouseLeaveEpoch={onMouseLeaveEpoch}
+                                />
+                            ))
+                        }
+                    </g>
+                </svg>
+            </div>
         )   
     }
 }

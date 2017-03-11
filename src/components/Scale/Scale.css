@@ -1,0 +1,31 @@
+.scale {
+  position: absolute;
+  top: 20px;
+  left: 1020px;
+  background-color: transparent;
+  border-width: 1px 1px 1px 0;
+  border-color: gray;
+  border-style: solid;
+}
+.scale > svg {
+  overflow: hidden;
+}
+.scale .cent > rect {
+  fill: #ffffff;
+  opacity: 0;
+}
+.scale .cent > text {
+  fill: #eeeeee;
+  font-size: 150px;
+  text-anchor: middle;
+}
+.scale .cent > line {
+  stroke: #000000;
+  stroke-width: 1px;
+  opacity: .5;
+}
+.scale .cent .decade > line {
+  stroke: #000000;
+  stroke-width: 1px;
+  opacity: .5;
+}

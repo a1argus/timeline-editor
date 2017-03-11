@@ -1,0 +1,10 @@
+.zoom-knob-view {
+  pointer-events: none;
+}
+.zoom-knob-view > rect {
+  fill: none;
+  stroke: #000000;
+  stroke-width: 1px;
+  rx: 3px;
+  ry: 3px;
+}

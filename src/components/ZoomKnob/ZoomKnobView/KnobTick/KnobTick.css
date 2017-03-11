@@ -1,0 +1,4 @@
+.zoom-knob__tick text {
+  text-anchor: middle;
+  text-rendering: geometricPrecision;
+}

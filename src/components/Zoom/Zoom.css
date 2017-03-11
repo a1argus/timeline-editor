@@ -1,0 +1,10 @@
+.zoom {
+    position: absolute;
+    top: 20px;
+    left: 1300px;
+    width: 100px;
+    height: 800px;
+    orient: vertical;
+    -webkit-appearance: slider-vertical;
+
+}

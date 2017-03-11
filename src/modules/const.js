@@ -1,5 +1,5 @@
  const c = {
-	svgH: 1000,
+	svgH: 800,
 	svgW: 1000,
 	defaultYear1: 1200,
 	defaultYear2: 1700,

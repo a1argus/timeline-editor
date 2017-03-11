@@ -1,22 +1,17 @@
 .screen {
   position: absolute;
-
   top: 20px;
   left: 20px;
   width: 1000px;
   height: 800px;
-
   background-color: transparent;
   border-width: 1px;
   border-color: gray;
   border-style: solid;
-
-  & > svg {
-    overflow: hidden;
-  }
-
-  .screen-back {
-    fill: white;
-  }
-
+}
+.screen > svg {
+  overflow: hidden;
+}
+.screen .screen-back {
+  fill: white;
 }

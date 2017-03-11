@@ -1,0 +1,7 @@
+.drop-files__clear-button {
+    border: 1px solid gray;
+    display: inline-block;
+    padding: 5px;
+    box-sizing: border-box;
+    height: 30px;
+}

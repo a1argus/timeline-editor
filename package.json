@@ -8,10 +8,13 @@
   "dependencies": {
     "d3": "^4.6.0",
     "isomorphic-fetch": "^2.2.1",
+    "lodash": "^4.17.4",
     "moment": "^2.17.1",
     "react": "^15.4.2",
     "react-addons-shallow-compare": "^15.4.2",
     "react-addons-update": "^15.4.2",
+    "react-dnd": "^2.2.4",
+    "react-dnd-html5-backend": "^2.2.4",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",
     "redux": "^3.6.0",

@@ -4,8 +4,7 @@ import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
 import createLogger from 'redux-logger'
-import c from './modules/const'
-import {yearsToZoom} from './modules/utils'
+import { limitsToTransform1D } from './modules/transforms'
 
 import reducer from './reducers'
 import App from './containers/App'
@@ -17,20 +16,24 @@ if (process.env.NODE_ENV !== 'production') {
   middleware.push(createLogger())
 }
 
-    
+const initialScreenSize = {width: 1000, height: 800}
 
-let {translateY, scaleY} = yearsToZoom({year1: c.defaultYear1, year2: c.defaultYear2})
+let {translate, scale} = limitsToTransform1D([1200, 1700], [0, initialScreenSize.height])
 const store = createStore(
     reducer,
     {
-        items: [],
-        zoom: {
-            translateX: 0,
-            translateY,
-            scaleX: 1,
-            scaleY
+        data: {
+            files: [],
+            timelines: {}
         },
-        animation: { duration: 500 }
+        transform: {
+            translateX: 0,
+            translateY: translate,
+            scaleX: 1,
+            scaleY: scale
+        },
+        animation: { duration: 500 },
+        screen: {size: initialScreenSize}
     },    
     applyMiddleware(...middleware)
 )
