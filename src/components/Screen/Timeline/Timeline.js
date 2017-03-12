@@ -2,9 +2,9 @@ import React, { PropTypes, Component } from 'react'
 import * as d3 from 'd3'
 import shallowCompareWF from 'shallow-compare-without-functions'
 
-import layoutMerge from '../../modules/layoutMerge'
-import { debug } from '../../modules/debug'
-import { transform1DToScale, transformToTransform1D, d3Transform } from '../../modules/transforms'
+import layoutMerge from '../../../modules/layoutMerge'
+import { debug } from '../../../modules/debug'
+import { transform1DToScale, transformToTransform1D, d3Transform } from '../../../modules/transforms'
 import './Timeline.css'
 
 const c = {

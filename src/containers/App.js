@@ -2,20 +2,27 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { DragDropContext } from 'react-dnd'
 import HTML5Backend from 'react-dnd-html5-backend'
-
+import _ from 'lodash'
 
 import {
-    fetchData,
     changeTransform,
     dragScreen,
     dragTimeline,
     selectEpoch,
-    unselectEpoch
+    unselectEpoch,
+    loadFile,
+    fetchFile,
+    clearFile,
+    exportAll,
+    hideFile,
+    clearAll,
+    unhideFile
 } from '../actions'
 import Screen from '../components/Screen/Screen'
 import ZoomKnob from '../components/ZoomKnob/ZoomKnob'
 import Scale from '../components/Scale/Scale'
 import OpenFilesPanel from '../components/OpenFilesPanel/OpenFilesPanel'
+import TimelineEditorPanel from '../components/TimelineEditorPanel/TimelineEditorPanel'
 import { transform1DToLimits, zoomByCenter } from '../modules/transforms'
 import './App.css'
 
@@ -23,9 +30,26 @@ class App extends Component {
     static propTypes = {
         data: PropTypes.object.isRequired,
     }
+    
+    onClearAll() {
+        this.props.dispatch(clearAll())
+    }
+    
+    onClearFile(fileName) {
+        this.props.dispatch(clearFile(fileName))
+    }
 
-    onDropFile() {
+    onExportAll() {
+        this.props.dispatch(exportAll())
+    }
 
+    onToggleHideFile(fileName, fileHidden) {
+        if(fileHidden) { this.props.dispatch(unhideFile(fileName)) }
+        else { this.props.dispatch(hideFile(fileName)) }
+    }
+
+    onOpenFile(file) {
+        this.props.dispatch(loadFile(file))
     }
 
     onChangeZoom(value) {
@@ -60,17 +84,24 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.props.dispatch(fetchData())
+        [
+            '/ru_moscow.tsv',
+            '/ru_tsarstvo.tsv'
+        ]
+        .forEach(url => {
+            this.props.dispatch(fetchFile([url], url.split('/').slice(-1)[0]))
+        })
+
     }
 
     
     render() {
         const { data, transform, animation, screen } = this.props
-
+        let timelines = _.omitBy(data.timelines, d => d.hidden)
         return (
             <div className='app'>
                 <Screen
-                    timelines={data.timelines}
+                    timelines={timelines}
                     size={screen.size}
                     transform={transform}
                     onDragScreen={this.onDragScreen.bind(this)}
@@ -95,9 +126,14 @@ class App extends Component {
                 <OpenFilesPanel
                     files={data.files}
                     message='Загрузить файлы'
-                    coords={{x: 1300, y: 20}}
-                    onClear={this.onDropFile.bind(this)}
-                    onOpen={this.onDropFile.bind(this)}
+                    onClearAll={this.onClearAll.bind(this)}
+                    timelines={timelines}
+                    onOpen={this.onOpenFile.bind(this)}
+                    onClearFile={this.onClearFile.bind(this)}
+                    onToggleHideFile={this.onToggleHideFile.bind(this)}
+                />
+                <TimelineEditorPanel
+                    message='Timeline'
                 />
             </div>
         )

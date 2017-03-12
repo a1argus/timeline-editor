@@ -1,5 +1,5 @@
-import c from './const'
+const DEBUG_VERBOSITY = 0
 
 export const debug = (verbosity, message) => {
-	if(verbosity <= c.debugVerbosity) { console.log(message); }
+	if(verbosity <= DEBUG_VERBOSITY) { console.log(message); }
 }

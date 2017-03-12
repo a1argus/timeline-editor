@@ -16,14 +16,14 @@ if (process.env.NODE_ENV !== 'production') {
   middleware.push(createLogger())
 }
 
-const initialScreenSize = {width: 1000, height: 800}
+const initialScreenSize = {width: 500, height: 800}
 
 let {translate, scale} = limitsToTransform1D([1200, 1700], [0, initialScreenSize.height])
 const store = createStore(
     reducer,
     {
         data: {
-            files: [],
+            files: {},
             timelines: {}
         },
         transform: {

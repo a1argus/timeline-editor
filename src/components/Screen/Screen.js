@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import { debug } from '../../modules/debug'
 import { d3Transform } from '../../modules/transforms'
-import Timeline from '../Timeline/Timeline'
+import Timeline from './Timeline/Timeline'
 import './Screen.css'
 
 
